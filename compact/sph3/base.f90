@@ -81,14 +81,14 @@
     write (*, 1113) rho_0, T,nu, mu, l, dh,CFL,N
     
     sqn=21
-    S=l*l
+    S=(1.25*0.6-2.0*3.14*0.25*0.25/4)
     m=rho_0*S/N
     
     k=2.0*mu*(1.0+nu)/(3.0*(1.0-2.0*nu))
     E=9.0*k*mu/(3.0*k+mu)
 
     cs_0=sqrt((E+4.0/3.0*mu)/rho_0)
-    h=1*sqrt(m/rho_0)
+    h=1.4*sqrt(m/rho_0)
     dt=CFL*h/(cs_0)
     
     allocate(vol(N))
@@ -164,7 +164,7 @@
         
     enddo
    
-    call plot_init(x,N,count_hole,count_section,index_section,index_hole)
+    !call plot_init(x,N,count_hole,count_section,index_section,index_hole)
     
     
     

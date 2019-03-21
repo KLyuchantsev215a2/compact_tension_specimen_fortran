@@ -49,7 +49,7 @@ subroutine Compute_Acceleration(N,h,dh,rho_0,mu,k,vol,F,C,PK1,x,x_old,nabla_W_0,
         enddo
     
         do k2=1,count_hole
-             acc(2,index_hole(k2))=acc(2,index_hole(k2))+1
+             acc(2,index_hole(k2))=acc(2,index_hole(k2))+0.1
         enddo
 
     

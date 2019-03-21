@@ -64,5 +64,6 @@
 		<File RelativePath=".\Convert_PK1_to_Cochi.f90"/>
 		<File RelativePath=".\ogpf.f90"/>
 		<File RelativePath=".\OneStepMaxwell.f90"/>
-		<File RelativePath=".\plot.f90"/></Filter></Files>
+		<File RelativePath=".\plot.f90"/>
+		<File RelativePath=".\plot_init.f90"/></Filter></Files>
 	<Globals/></VisualStudioProject>

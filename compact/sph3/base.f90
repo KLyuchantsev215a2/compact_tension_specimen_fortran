@@ -164,10 +164,11 @@
         
     enddo
    
+    call plot_init(x,N,count_hole,count_section,index_section,index_hole)
     
     
     
-    ! do i=1,N
+   ! do i=1,N
    !     read (1, 1110) a,v(1,i),v(2,i)
    ! enddo
    v=0
@@ -226,7 +227,10 @@
        ! call  plot(x,N)
     enddo
     
+  
+    
     pause
+    
     call  plot(xplot,N,int(T/dt))
     
     

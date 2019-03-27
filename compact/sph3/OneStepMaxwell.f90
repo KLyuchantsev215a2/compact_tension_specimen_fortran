@@ -1,62 +1,104 @@
-subroutine OneStepMaxwell(Fp,mu,k,eta,dt,Cip,N,C,Ci_new)
+subroutine OneStepMaxwell(F,mu,k,eta,dt,Ci,N,Couchy,Ci_new,PK1)
     
     integer:: N
     real*8 :: F(2,2,N)
-    real*8 :: C(2,2,N)
+    real*8 :: Couchy(2,2,N)
+    real*8 :: Ci(2,2,N)
+    real*8 :: Ci_new(3,3,N)
     real*8 :: mu
+    real*8 :: dt
     real*8 :: k
-
+    real*8 :: eta
+    
+    real*8 ::PK1(2,2,N)
+    real*8 ::PK1_trans_tmp(2,2)
+    
     real*8::detFp
     real*8 ::Fp(3,3)
+    real*8 ::invFp(3,3)
     real*8 :: trans_Fp(3,3)
-    real*8 ::B(3,3)
-    real*8 ::B_iso(3,3)
-    real*8 ::dev_B_iso(3,3)
     
-    C=0
+    real*8 ::C(3,3)
+    real*8 ::invC(3,3)
+    real*8 ::Ci3x3(3,3)
+    
+    real*8 ::Cip(3,3)
+    real*8 ::invCip(3,3)
+    real*8 ::multCCi(3,3)
+    
+    real*8 ::C_iso(3,3)
+    real*8 ::dev_C_iso(3,3)
+    real*8 ::Stress2PK(3,3)
+    real*8::devmultCCi(3,3)
+    real*8:: Couchy_tmp(3,3)
+    
+    Couchy=0
+    PK1=0
+    
     do i=1,N
-
-        B=0
+        Ci3x3=0
+        C=0
         Fp=0
         
-        do alpha=1,2
-            do beta=1,2
-                Fp(alpha,beta)=F(alpha,beta,i)
-            enddo
-        enddo
-
+  
+        Fp(1:2,1:2)=F(1:2,1:2,i)
+        
         Fp(3,3)=1
-        detFp=Fp(1,1)*Fp(2,2)-Fp(1,2)*Fp(2,1)
+        
+        detFp=(Fp(1,1)*Fp(2,2)-Fp(1,2)*Fp(2,1))
+        
+        call trans(Fp,trans_Fp)
+          
+        call mymulty(trans_Fp,Fp,C)
 
+        C_iso=detFp**(-2.0/3.0)*C
+
+        Ci3x3(1:2,1:2)=Ci(1:2,1:2,i)
+        Ci3x3(3,3)=1.0/(Ci(1,1,i)*Ci(2,2,i)-Ci(1,2,i)*Ci(2,1,i))
+        
+        Cip=Ci3x3;
+        
+        Ci3x3 = Ci3x3 + dt*mu/eta*C_iso
+        
+        detCi3x3=(Ci3x3(1,1)*Ci3x3(2,2)-Ci3x3(1,2)*Ci3x3(2,1))*Ci3x3(3,3)
+        
+        Ci3x3 = (detCi3x3**(-1.0/3.0))*Ci3x3
+        
+        Ci_new(1:2,1:2,i) = Ci3x3(1:2,1:2)
+        
+        call inv_matrix(C,invC)
+        call inv_matrix(Cip,invCip)
+        call mymulty(C_iso,invCip,multCCi)
+        call dev(multCCi,devmultCCi)
+        call mymulty(mu*invC,devmultCCi,Stress2PK)
+        
+        call mymulty(Stress2PK,trans_Fp,Couchy_tmp)
+        call mymulty(Fp,Couchy_tmp,Couchy_tmp)
+        
         do alpha=1,3
-            do beta=1,3
-                trans_Fp(alpha,beta)=Fp(beta,alpha)
-            enddo
+            Couchy_tmp(alpha,alpha)=Couchy_tmp(alpha,alpha)+k/10.0*(detFp**5-detFp**(-5))/detFp
         enddo
-
-        do alpha=1,3
-            do beta=1,3
-                B(alpha,beta)=0
+        
+        call inv_matrix(Fp,invFp)
+        
+         do alpha=1,2
+            do beta=1,2
+               PK1(alpha,beta,i)=0
                 do gamma=1,3
-                    B(alpha,beta)=B(alpha,beta)+Fp(alpha,gamma)*trans_Fp(gamma,beta)
+                   PK1(alpha,beta,i)=PK1(alpha,beta,i)+invFp(alpha,gamma)*Couchy_tmp(gamma,beta)
                 enddo
             enddo
+         enddo
+        
+         PK1_trans_tmp(1:2,1:2)=PK1(1:2,1:2,i)
+         
+         do alpha=1,2
+          do beta=1,2
+               PK1(alpha,beta,i)=PK1_trans_tmp(beta,alpha)
+            enddo
         enddo
-
-        B_iso=detFp**(-2.0/3.0)*B
-
-        dev_B_iso=B_iso
-
-        dev_B_iso(1,1)=dev_B_iso(1,1)-(1.0/3.0)*(B_iso(1,1)+B_iso(2,2)+B_iso(3,3))
-        dev_B_iso(2,2)=dev_B_iso(2,2)-(1.0/3.0)*(B_iso(1,1)+B_iso(2,2)+B_iso(3,3))
-        dev_B_iso(3,3)=dev_B_iso(3,3)-(1.0/3.0)*(B_iso(1,1)+B_iso(2,2)+B_iso(3,3))
-
-        C(1:2,1:2,i)=mu*dev_B_iso(1:2,1:2)/detFp
-
-        C(1,1,i)=C(1,1,i)+k/10.0*(detFp**5-detFp**(-5))/detFp
-        C(2,2,i)=C(2,2,i)+k/10.0*(detFp**5-detFp**(-5))/detFp
-
-    enddo
     
+        Couchy(1:2,1:2,i)=Couchy_tmp(1:2,1:2)  
+    enddo
 return
 end

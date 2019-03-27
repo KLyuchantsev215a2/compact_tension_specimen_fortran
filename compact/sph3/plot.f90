@@ -16,7 +16,7 @@
         
         call gp%animation_start(1)
         
-        do i=1, frame, 100
+        do i=1, frame, 400
             xg=x(1,1:N,i)
             yg=x(2,1:N,i)
             
@@ -28,7 +28,7 @@
             CALL gp%ylabel('y [mm]')
             Call gp%options('set style data linespoints')
             !Call Plot to draw a vector against a vector of data
-            call gp%options('set xrange[-0.1:1.3];set yrange [-0.1:0.8];')
+            call gp%options('set xrange[-0.1:2];set yrange [-0.1:2];')
             call gp%plot(xg, yg,'title "square coordinates" with points lt 6 lc rgb "#FF1100"')
         enddo
         

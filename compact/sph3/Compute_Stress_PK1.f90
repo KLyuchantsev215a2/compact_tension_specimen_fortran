@@ -18,10 +18,10 @@
     real*8 ::dev_B_iso(3,3)
     
     PK1=0
-    C3x3=0
-    
+   
     do i=1,N
-
+        
+        C3x3=0
         B=0
         Fp=0
         

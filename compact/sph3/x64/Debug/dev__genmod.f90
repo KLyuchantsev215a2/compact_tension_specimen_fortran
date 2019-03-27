@@ -1,9 +1,9 @@
-        !COMPILER-GENERATED INTERFACE MODULE: Tue Mar 19 09:46:57 2019
+        !COMPILER-GENERATED INTERFACE MODULE: Tue Mar 26 17:32:14 2019
         MODULE DEV__genmod
           INTERFACE 
-            FUNCTION DEV(M)
+            SUBROUTINE DEV(M,DEVM)
               REAL(KIND=8) :: M(3,3)
-              REAL(KIND=8) :: DEV(3,3)
-            END FUNCTION DEV
+              REAL(KIND=8) :: DEVM(3,3)
+            END SUBROUTINE DEV
           END INTERFACE 
         END MODULE DEV__genmod

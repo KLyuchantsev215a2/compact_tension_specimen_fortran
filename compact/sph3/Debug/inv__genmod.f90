@@ -1,9 +1,9 @@
-        !COMPILER-GENERATED INTERFACE MODULE: Mon Jan 28 18:19:14 2019
+        !COMPILER-GENERATED INTERFACE MODULE: Tue Mar 26 13:12:18 2019
         MODULE INV__genmod
           INTERFACE 
-            FUNCTION INV(M)
-              REAL(KIND=4) :: M(2,2)
-              REAL(KIND=4) :: INV(2,2)
-            END FUNCTION INV
+            SUBROUTINE INV(M,INVM)
+              REAL(KIND=8) :: M(3,3)
+              REAL(KIND=8) :: INVM(3,3)
+            END SUBROUTINE INV
           END INTERFACE 
         END MODULE INV__genmod

@@ -1,4 +1,4 @@
-subroutine Compute_Acceleration(N,h,dh,rho_0,mu,k,eta,damping,vol,F,Couchy,PK1,x,x_old,v_old,nabla_W_0,nabla_W,W,Wper1,Wper2,Wper3,Wper4,acc,count_hole,count_section,index_section,index_hole,Ci,Ci_new)
+subroutine Compute_Acceleration(N,h,dh,rho_0,mu,k,eta,damping,vol,F,Couchy,PK1,x,x_old,v_old,nabla_W_0,nabla_W,W,Wper1,Wper2,Wper3,Wper4,acc,count_hole,count_section,index_section,index_hole,Ci,Ci_new,table)
     integer :: N,i,j,alpha,beta,k1,k2,count_hole,count_section
     real*8 :: h
     real*8 :: dh
@@ -27,20 +27,21 @@ subroutine Compute_Acceleration(N,h,dh,rho_0,mu,k,eta,damping,vol,F,Couchy,PK1,x
     real*8 :: acc(2,N)
     integer :: index_section(count_section)
     integer :: index_hole(count_hole)
+    real*8 :: table(N,30)
 
    ! call compute_W_cor(x,x,h,N,vol,W)
     !call Compute_nabla_W(x,h,vol,N,W,Wper1,Wper2,Wper3,Wper4,nabla_W,dh)
-    call Compute_F(vol,x,x_old,nabla_W_0,N,F)
+    call Compute_F(vol,x,x_old,nabla_W_0,N,F,table)
     call  OneStepMaxwell(F,mu,k,eta,dt,Ci,N,Couchy,Ci_new,PK1)
   !  call Compute_Stress_PK1(F,Couchy,PK1,mu,k,N)
 
     acc=0
 
     do i=1,N
-        do j=1,N
+        do j=1,table(i,1)
             do beta=1,2
                 do alpha=1,2
-                    acc(alpha,i)=acc(alpha,i)-(vol(j))*PK1(alpha,beta,j)*nabla_W_0(beta,j,i)
+                    acc(alpha,i)=acc(alpha,i)-(vol(table(i,j+1)))*PK1(alpha,beta,table(i,j+1))*nabla_W_0(beta,table(i,j+1),i)
                 enddo
                 acc(beta,i)=acc(beta,i)-damping*v_old(beta,i)
             enddo

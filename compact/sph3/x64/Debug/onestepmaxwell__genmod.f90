@@ -1,4 +1,4 @@
-        !COMPILER-GENERATED INTERFACE MODULE: Tue Mar 26 17:32:15 2019
+        !COMPILER-GENERATED INTERFACE MODULE: Thu Mar 28 11:37:14 2019
         MODULE ONESTEPMAXWELL__genmod
           INTERFACE 
             SUBROUTINE ONESTEPMAXWELL(F,MU,K,ETA,DT,CI,N,COUCHY,CI_NEW, &
@@ -7,7 +7,7 @@
               REAL(KIND=8) :: F(2,2,N)
               REAL(KIND=8) :: MU
               REAL(KIND=8) :: K
-              REAL(KIND=4) :: ETA
+              REAL(KIND=8) :: ETA
               REAL(KIND=8) :: DT
               REAL(KIND=8) :: CI(2,2,N)
               REAL(KIND=8) :: COUCHY(2,2,N)

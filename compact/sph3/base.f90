@@ -15,6 +15,7 @@
     real*8, allocatable :: x(:,:)
     real*8, allocatable :: xplot(:,:,:)
     real*8, allocatable :: x_init(:,:)
+    real*8, allocatable :: table(:,:)
     real*8, allocatable :: v(:,:)
    
     real*8, allocatable :: W(:,:)
@@ -65,7 +66,7 @@
       
      end interface
     
-    open (unit=1, file="input21.txt", status='old',    &
+    open (unit=1, file="input41.txt", status='old',    &
              access='sequential', form='formatted', action='read' )
     open (unit=2, file="output_x.txt", action='write')
     open (unit=3, file="output_C.txt", action='write')
@@ -85,14 +86,15 @@
     E=9.0*k*mu/(3.0*k+mu)
 
     cs_0=sqrt((E+4.0/3.0*mu)/rho_0)
-    h=1*sqrt(m/rho_0)
+    h=1.2*sqrt(m/rho_0)
     dt=CFL*h/(cs_0)
     
     allocate(vol(N))
     allocate(x(2,N))
-    allocate(xplot(2,N,int(T/dt)))
+    !allocate(xplot(2,N,int(T/dt)))
     allocate(x_init(2,N))
     allocate(v(2,N))
+    allocate(table(N,30))
     
     allocate(acc(2,N))
     allocate(x_0(2,N),x_n_1(2,N),x_n_2(2,N),x_n_1_2(2,N),x_n_3_2(2,N))
@@ -122,7 +124,9 @@
     
       do i=1,N
         read (1, 1110) a,v(1,i),v(2,i)
-    enddo
+      enddo
+      
+    call Create_Table(x,h,table,N)
  !   do i=1,N !razrez
         
     !    if ((x(1,i)<=0.7) * (abs(x(2,i))<0.001)) then
@@ -173,8 +177,8 @@
     
    
    
-   call Compute_nabla_W(x,h,vol,N,W,Wper1,Wper2,Wper3,Wper4,nabla_W_0,dh)!tmp
-   call Compute_F(vol,x,x_init,nabla_W_0,N,F)
+   call Compute_nabla_W(x,h,vol,N,W,Wper1,Wper2,Wper3,Wper4,nabla_W_0,dh,table)!tmp
+   call Compute_F(vol,x,x_init,nabla_W_0,N,F,table)
    Ci=F
    call  OneStepMaxwell(F,mu,k,eta,dt,Ci,N,Couchy,Ci_new,PK1)
    Ci(1:2,1:2,1:N)=Ci_new(1:2,1:2,1:N)
@@ -182,30 +186,30 @@
     do step=1,int(T/dt)
         x_0=x
         v_0_0=v
-        call Compute_Acceleration(N,h,dh,rho_0,mu,k,eta,damping,vol,F,Couchy,PK1,x_0,x_init,v,nabla_W_0,nabla_W,W,Wper1,Wper2,Wper3,Wper4,acc,count_hole,count_section,index_section,index_hole,Ci,Ci_new)
+        call Compute_Acceleration(N,h,dh,rho_0,mu,k,eta,damping,vol,F,Couchy,PK1,x_0,x_init,v,nabla_W_0,nabla_W,W,Wper1,Wper2,Wper3,Wper4,acc,count_hole,count_section,index_section,index_hole,Ci,Ci_new,table)
         x_n_1=x_0+dt*v_0_0
         v_n_1=v_0_0+dt*acc
-        call Compute_Acceleration(N,h,dh,rho_0,mu,k,eta,damping,vol,F,Couchy,PK1,x_n_1,x_init,v_n_1,nabla_W_0,nabla_W,W,Wper1,Wper2,Wper3,Wper4,acc,count_hole,count_section,index_section,index_hole,Ci,Ci_new)
+        call Compute_Acceleration(N,h,dh,rho_0,mu,k,eta,damping,vol,F,Couchy,PK1,x_n_1,x_init,v_n_1,nabla_W_0,nabla_W,W,Wper1,Wper2,Wper3,Wper4,acc,count_hole,count_section,index_section,index_hole,Ci,Ci_new,table)
         x_n_2=x_n_1+dt*v_n_1     
         v_n_2=v_n_1+dt*acc
         x_n_1_2=3.0/4.0*x_0+1.0/4.0*x_n_2
         v_n_1_2=3.0/4.0*v_0_0+1.0/4.0*v_n_2
-        call Compute_Acceleration(N,h,dh,rho_0,mu,k,eta,damping,vol,F,Couchy,PK1,x_n_1_2,x_init,v_n_1_2,nabla_W_0,nabla_W,W,Wper1,Wper2,Wper3,Wper4,acc,count_hole,count_section,index_section,index_hole,Ci,Ci_new)
+        call Compute_Acceleration(N,h,dh,rho_0,mu,k,eta,damping,vol,F,Couchy,PK1,x_n_1_2,x_init,v_n_1_2,nabla_W_0,nabla_W,W,Wper1,Wper2,Wper3,Wper4,acc,count_hole,count_section,index_section,index_hole,Ci,Ci_new,table)
         x_n_3_2=x_n_1_2+dt*v_n_1_2
         v_n_3_2=v_n_1_2+dt*acc
         x=1.0/3.0*x_0+2.0/3.0*x_n_3_2
         v=1.0/3.0*v_0_0+2.0/3.0*v_n_3_2
         
-        call Compute_F(vol,x,x_init,nabla_W_0,N,F) 
+        call Compute_F(vol,x,x_init,nabla_W_0,N,F,table) 
         call  OneStepMaxwell(F,mu,k,eta,dt,Ci,N,Couchy,Ci_new,PK1)
         Ci(1:2,1:2,1:N)=Ci_new(1:2,1:2,1:N)
         
         time_calculated=(real(step)*dt)
         
-        xplot(1:2,1:N,step)=x
+        !xplot(1:2,1:N,step)=x
     
-        write (2,1111) x(1,441)-x_init(1,441),x(2,441)-x_init(2,441),time_calculated
-        write (3,1112) Couchy(1,2,221),Couchy(1,1,221),Couchy(2,2,221),time_calculated
+        write (2,1111) x(1,1681)-x_init(1,1681),x(2,1681)-x_init(2,1681),time_calculated
+        write (3,1112) Couchy(1,2,841),Couchy(1,1,841),Couchy(2,2,841),time_calculated
      
     enddo
     
@@ -213,7 +217,7 @@
     
     pause
     
-    call  plot(xplot,N,int(T/dt))
+    !call  plot(xplot,N,int(T/dt))
     
     
     deallocate(vol)
@@ -227,6 +231,7 @@
     deallocate(W)
     deallocate(nabla_W)
     deallocate(nabla_W_0)
+    deallocate(table)
     
      1100 format (7f10.6,1i4)
     1113 format ("Density "1f10.6,/,"Time "1f10.6,/,"Poisson's ratio " 1f10.6,/,"Shear modulus " 1f10.6,/,"Side of a square " 1f10.6,/,"For finite difference " 1f10.6,/,"CFL " 1f10.6,/,"Particle count " 1i4)

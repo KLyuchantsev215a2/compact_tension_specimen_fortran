@@ -27,8 +27,7 @@
     real*8, allocatable :: nabla_W_0(:,:,:)
     
     real*8, allocatable :: Couchy(:,:,:)
-     real*8, allocatable :: PK1(:,:,:)
-   ! real*8, allocatable :: Cochi(:,:,:)
+    real*8, allocatable :: PK1(:,:,:)
     real*8, allocatable :: F(:,:,:)
     real*8, allocatable :: Ci(:,:,:)
     real*8, allocatable :: Ci_new(:,:,:)
@@ -77,7 +76,8 @@
     write (*, 1113) rho_0, T,nu, mu, l, dh,CFL,N
     
     sqn=21
-    S=(1.25*0.6-3.14*0.25*0.25/4)
+    !S=(1.25*0.6-3.14*0.25*0.25/4)
+    S=1
     m=rho_0*S/N
     
     k=2.0*mu*(1.0+nu)/(3.0*(1.0-2.0*nu))
@@ -86,12 +86,12 @@
     E=9.0*k*mu/(3.0*k+mu)
 
     cs_0=sqrt((E+4.0/3.0*mu)/rho_0)
-    h=1.2*sqrt(m/rho_0)
+    h=1.4*sqrt(m/rho_0)
     dt=CFL*h/(cs_0)
     
     allocate(vol(N))
     allocate(x(2,N))
-    !allocate(xplot(2,N,int(T/dt)))
+    allocate(xplot(2,N,int(T/dt)))
     allocate(x_init(2,N))
     allocate(v(2,N))
     allocate(table(N,30))
@@ -126,53 +126,58 @@
         read (1, 1110) a,v(1,i),v(2,i)
       enddo
       
-    call Create_Table(x,h,table,N)
- !   do i=1,N !razrez
-        
-    !    if ((x(1,i)<=0.7) * (abs(x(2,i))<0.001)) then
-   !          x(2,i)=x(2,i)+0.001
-   !     end if
     
-  !  enddo
-     
-   ! count_hole=0
+  !  do i=1,N !razrez
+  !      
+   !     if ((x(1,i)<=0.7) * (abs(x(2,i))<0.001)) then
+   !          x(2,i)=x(2,i)+0.001
+  !      end if
+    
+    !enddo
+    
+    call Create_Table(x,h,table,N)
+    
+   !  count_hole=0
    ! count_section=0
     
-   ! do i=1,N
-   !     
-    !    if(      (sqrt((x(1,i)-0.25)**2+(x(2,i)-0.325)**2))<(0.25/2+0.001)          ) then
-   !             count_hole=count_hole+1
-    !    end if
+  !  do i=1,N
+         
+       ! if(      (sqrt((x(1,i)-0.25)**2+(x(2,i)-0.325)**2))<(0.25/2+0.001)          ) then
+        !        count_hole=count_hole+1
+       ! end if
+  !       if(      ((x(1,i)<0.2)*(x(2,i)>0.4)*(x(2,i)<0.85))        ) then
+  !              count_hole=count_hole+1
+   !     end if
         
-    !    if ( (x(1,i)>0.7)*(x(2,i)<=0.001))     then
+   !     if ( (x(1,i)>0.7)*(x(2,i)<=0.001))     then
   !              count_section=count_section+1
-    !    end if
+  !      end if
         
   !  enddo
     
-  !  allocate(index_hole(count_hole))
-  !  allocate(index_section(count_section))
+    allocate(index_hole(count_hole))
+    allocate(index_section(count_section))
      
   !  k1=1
   !  k2=1
-  !  do i=1,N
+ !   do i=1,N
         
-   !     if(      (sqrt((x(1,i)-0.25)**2+(x(2,i)-0.325)**2))<(0.25/2+0.001)          ) then
+   !     if(      ((x(1,i)<0.2)*(x(2,i)>0.4)*(x(2,i)<0.85))        ) then! if(      (sqrt((x(1,i)-0.25)**2+(x(2,i)-0.325)**2))<(0.25/2+0.001)          ) then
    !             index_hole(k1)=i
-   !             k1=k1+1
+  !              k1=k1+1
     !    end if
-   !     
         
-     !   if ( (x(1,i)>0.7)*(x(2,i)<=0.001))     then
-     !           index_section(k2)=i                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
-     !           k2=k2+1
-     !   end if
         
-  !  enddo
+    !    if ( (x(1,i)>0.7)*(x(2,i)<=0.001))     then
+   !             index_section(k2)=i                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+   !             k2=k2+1
+   !     end if
+        
+   ! enddo
    
     !call plot_init(x,N,count_hole,count_section,index_section,index_hole)
 
- !  v=0
+  ! v=0
    x_init=x
     
    
@@ -206,7 +211,7 @@
         
         time_calculated=(real(step)*dt)
         
-        !xplot(1:2,1:N,step)=x
+        xplot(1:2,1:N,step)=x
     
         write (2,1111) x(1,1681)-x_init(1,1681),x(2,1681)-x_init(2,1681),time_calculated
         write (3,1112) Couchy(1,2,841),Couchy(1,1,841),Couchy(2,2,841),time_calculated
@@ -217,7 +222,7 @@
     
     pause
     
-    !call  plot(xplot,N,int(T/dt))
+    call  plot(xplot,N,int(T/dt))
     
     
     deallocate(vol)

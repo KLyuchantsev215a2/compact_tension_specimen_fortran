@@ -33,6 +33,7 @@ subroutine Compute_Acceleration(N,h,dh,rho_0,mu,k,eta,damping,vol,F,Couchy,PK1,x
     !call Compute_nabla_W(x,h,vol,N,W,Wper1,Wper2,Wper3,Wper4,nabla_W,dh)
     call Compute_F(vol,x,x_old,nabla_W_0,N,F,table)
     call  OneStepMaxwell(F,mu,k,eta,dt,Ci,N,Couchy,Ci_new,PK1)
+    Ci(1:2,1:2,1:N)=Ci_new(1:2,1:2,1:N)
   !  call Compute_Stress_PK1(F,Couchy,PK1,mu,k,N)
 
     acc=0
@@ -53,13 +54,13 @@ subroutine Compute_Acceleration(N,h,dh,rho_0,mu,k,eta,damping,vol,F,Couchy,PK1,x
     enddo
     
  
-      !  do k1=1,count_section
-     !        acc(2,index_section(k1))=0
-      !  enddo
+  !  do k1=1,count_section
+  !      acc(2,index_section(k1))=0
+  !  enddo
     
-      !  do k2=1,count_hole
-     !        acc(2,index_hole(k2))=acc(2,index_hole(k2))+0.1
-     !   enddo
+   ! do k2=1,count_hole
+  !      acc(2,index_hole(k2))=acc(2,index_hole(k2))+0.1
+   ! enddo
 
     
     return

@@ -49,6 +49,7 @@
 		<Filter Name="Resource Files" Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe">
 		<File RelativePath=".\input.txt"/>
 		<File RelativePath=".\input11.txt"/>
+		<File RelativePath=".\input1681.txt"/>
 		<File RelativePath=".\input21.txt"/>
 		<File RelativePath=".\input400.txt"/>
 		<File RelativePath=".\input41.txt"/>
